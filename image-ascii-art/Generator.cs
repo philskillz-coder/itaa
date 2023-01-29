@@ -67,11 +67,11 @@ internal class Generator
         int Offset
     )
     {
-        Bitmap original = (Bitmap) Image.FromFile(ImagePath);
+        Bitmap original = (Bitmap)Image.FromFile(ImagePath);
         int ResizedWidth = Width ?? original.Width;
 
-        float w_pc = (float) ResizedWidth / original.Width;
-        int ResizedHeight = (int) Math.Floor(original.Height * w_pc);
+        float w_pc = (float)ResizedWidth / original.Width;
+        int ResizedHeight = (int)Math.Floor(original.Height * w_pc);
 
         int NewWidth = ResizedWidth * CharacterSpacing;
         int NewHeight = ResizedHeight * CharacterSpacing;
@@ -100,9 +100,9 @@ internal class Generator
         for (int y = 0; y < ResizedHeight; y++)
         {
             for (int x = 0; x < ResizedWidth; x++)
-            { 
+            {
                 Color pixel = original.GetPixel(x, y);
-                int letter_count = mirror(BrightnessLevels, chunk(BrightnessLevels, (int) (pixel.GetBrightness()*255))) + MinLetters;
+                int letter_count = mirror(BrightnessLevels, chunk(BrightnessLevels, (int)(pixel.GetBrightness() * 255))) + MinLetters;
                 int offset_bounds = Offset * letter_count;
                 string current_char = ImageText[current_character].ToString();
 
@@ -117,7 +117,8 @@ internal class Generator
                             y * CharacterSpacing
                         )
                     );
-                } else
+                }
+                else
                 {
                     for (int i = 0; i < letter_count; i++)
                     {
@@ -142,7 +143,7 @@ internal class Generator
 
             }
         }
-        
+
 
         return @new;
     }

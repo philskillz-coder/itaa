@@ -1,11 +1,7 @@
-﻿using System;
+﻿using CommandLine;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.Versioning;
-using Aspose.Imaging.FileFormats.Core.VectorPaths;
-using Aspose.Imaging.ImageOptions;
-using CommandLine;
-using static image_ascii_art.Program;
 
 namespace image_ascii_art;
 
@@ -19,7 +15,7 @@ class Program
         [Option('o', "output", Required = true, HelpText = "The output path of the image")]
         public string OutputPath { get; set; }
 
-        [Option('t', "text", Required = false, Default = "theskz4evr", HelpText = "The text to write on the image")]
+        [Option('t', "text", Required = false, Default = "theskz", HelpText = "The text to write on the image")]
         public string ImageText { get; set; }
 
         [Option("resized-width", Required = false, HelpText = "The width to resize the image before processing")]
@@ -37,27 +33,10 @@ class Program
         [Option("min-letters", Required = false, Default = 1, HelpText = "The minimum number of letters per pixel")]
         public int MinLetters { get; set; }
 
-        [Option("offset", Required = false, Default = 2, HelpText = "The offset (in pixels) per letter")]
+        [Option("offset", Required = false, Default = 2, HelpText = "The drawing offset for letters")]
         public int Offset { get; set; }
 
     }
-
-    public static Dictionary<int, string> Units = new Dictionary<int, string>()
-    {
-        {0, "" },
-        {1, "" },
-        {2, "" },
-        {3, "K" },
-        {4, "K" },
-        {5, "K" },
-        {6, "M" },
-        {7, "M" },
-        {8, "M" },
-        {9, "B" },
-        {10, "B" },
-        {11, "B" },
-        {12, "T" }
-    };
 
     public static string KiloFormat(int num)
     {
@@ -114,7 +93,7 @@ class Program
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine($"Selected image: {options.ImagePath}");
             Console.WriteLine($"Using text: {options.ImageText}");
-            Console.WriteLine($"Resized image: {options.ResizedWidth.ToString() ?? "<original>"} pixels");
+            Console.WriteLine($"Resized to {options.ResizedWidth.ToString() ?? "<original>"} pixels ");
             Console.ForegroundColor = ConsoleColor.White;
 
             var watch = new System.Diagnostics.Stopwatch();
@@ -133,27 +112,17 @@ class Program
                 )
             )
             {
-                using (Stream stream = new MemoryStream())
-                {
-                    size = generated.Size;
-                    generated.Save(stream, ImageFormat.Png);
-                    stream.Seek(0, SeekOrigin.Begin);
-
-                    using (Aspose.Imaging.Image compressed = Aspose.Imaging.Image.Load(stream))
-                    {
-                        PngOptions pngOptions = new PngOptions();
-                        pngOptions.CompressionLevel = 9;
-                        compressed.Save(options.OutputPath, pngOptions);
-                    }
-                }
+                size = generated.Size;
+                generated.Save(options.OutputPath, ImageFormat.Png);
             }
+
             watch.Stop();
 
             Console.WriteLine();
             Console.WriteLine("#############################################################################################");
             Console.WriteLine();
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine($"Generated {KiloFormat(size.Height*size.Width)} Pixels in {watch.Elapsed.TotalSeconds.ToString("0.##")} seconds");
+            Console.WriteLine($"Generated {KiloFormat(size.Height * size.Width)} Pixels in {watch.Elapsed.TotalSeconds.ToString("0.##")} seconds");
             Console.WriteLine($"Image saved as {options.OutputPath}");
 
             Console.ForegroundColor = ConsoleColor.White;
