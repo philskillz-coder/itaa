@@ -2,6 +2,7 @@
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.Versioning;
+using Aspose.Imaging.FileFormats.Core.VectorPaths;
 using Aspose.Imaging.ImageOptions;
 using CommandLine;
 using static image_ascii_art.Program;
@@ -41,6 +42,40 @@ class Program
 
     }
 
+    public static Dictionary<int, string> Units = new Dictionary<int, string>()
+    {
+        {0, "" },
+        {1, "" },
+        {2, "" },
+        {3, "K" },
+        {4, "K" },
+        {5, "K" },
+        {6, "M" },
+        {7, "M" },
+        {8, "M" },
+        {9, "B" },
+        {10, "B" },
+        {11, "B" },
+        {12, "T" }
+    };
+
+    public static string KiloFormat(int num)
+    {
+        if (num >= 100_000_000)
+            return (num / 1000000).ToString("#,0M");
+
+        if (num >= 10_000_000)
+            return (num / 1000000).ToString("0.#") + "M";
+
+        if (num >= 100_000)
+            return (num / 1000).ToString("#,0K");
+
+        if (num >= 10_000)
+            return (num / 1000).ToString("0.#") + "K";
+
+        return num.ToString("#,0");
+    }
+
     [SupportedOSPlatform("windows")]
     static void Main(string[] args)
     {
@@ -67,7 +102,8 @@ class Program
         Console.ForegroundColor = ConsoleColor.Magenta;
         Console.WriteLine("                                  [I]mage [t]o [a]scii [a]rt                                  ");
         Console.WriteLine("                                   Made by Philskillz_#0266                                   ");
-        Console.WriteLine("                                          theskz.dev                                          ");
+        Console.WriteLine("                              github.com/philskillz-coder/itaa                                ");
+        Console.WriteLine("                                         theskz.dev                                           ");
 
         Console.ForegroundColor = ConsoleColor.White;
 
@@ -82,8 +118,10 @@ class Program
             Console.ForegroundColor = ConsoleColor.White;
 
             var watch = new System.Diagnostics.Stopwatch();
+            Size size;
+
             watch.Start();
-            using (Image image = Generator.GenerateImage(
+            using (Image generated = Generator.GenerateImage(
                 ImagePath: options.ImagePath,
                 Width: options.ResizedWidth,
                 ImageText: options.ImageText,
@@ -95,16 +133,17 @@ class Program
                 )
             )
             {
-                using (Stream s = new MemoryStream())
+                using (Stream stream = new MemoryStream())
                 {
-                    image.Save(s, ImageFormat.Png);
-                    s.Seek(0, SeekOrigin.Begin);
+                    size = generated.Size;
+                    generated.Save(stream, ImageFormat.Png);
+                    stream.Seek(0, SeekOrigin.Begin);
 
-                    using (Aspose.Imaging.Image im = Aspose.Imaging.Image.Load(s))
+                    using (Aspose.Imaging.Image compressed = Aspose.Imaging.Image.Load(stream))
                     {
-                        PngOptions o = new PngOptions();
-                        o.CompressionLevel = 9;
-                        im.Save(options.OutputPath, o);
+                        PngOptions pngOptions = new PngOptions();
+                        pngOptions.CompressionLevel = 9;
+                        compressed.Save(options.OutputPath, pngOptions);
                     }
                 }
             }
@@ -114,31 +153,13 @@ class Program
             Console.WriteLine("#############################################################################################");
             Console.WriteLine();
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine($"Image generated in {watch.Elapsed.TotalSeconds.ToString("0.##")} seconds");
+            Console.WriteLine($"Generated {KiloFormat(size.Height*size.Width)} Pixels in {watch.Elapsed.TotalSeconds.ToString("0.##")} seconds");
             Console.WriteLine($"Image saved as {options.OutputPath}");
 
             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine();
             Console.WriteLine("#############################################################################################");
         });
-
-        //using (Image image = Generator.GenerateImage(
-        //    ImagePath: "C:\\Users\\Philskillz\\PycharmProjects\\image-text-art\\img.png",
-        //    Width: 500,
-        //    ImageText: "theskz",
-        //    FontSize: 10,
-        //    CharacterSpacing: 8,
-        //    BrightnessLevels: 8,
-        //    MinLetters: 1,
-        //    Offset: 4
-        //    )
-        //)
-        //{
-        //    image.Save(
-        //        "C:\\Users\\Philskillz\\source\\repos\\image-ascii-art\\image-ascii-art\\save.png"
-        //    );
-        //}
-
 
     }
 }
